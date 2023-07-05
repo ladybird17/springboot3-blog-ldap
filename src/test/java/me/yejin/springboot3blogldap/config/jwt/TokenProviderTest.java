@@ -102,7 +102,7 @@ public class TokenProviderTest {
     assertThat(((UserDetails) authentication.getPrincipal()).getUsername()).isEqualTo(username);
   }
 
-  @DisplayName("getUserId(): 토큰 기반으로 사용자 id를 가져오는 것에 성공한다.")
+  @DisplayName("getUserId(): 토큰 기반으로 사용자 dn을 가져오는 것에 성공한다.")
   @Test
   void getUserId() {
     //given
