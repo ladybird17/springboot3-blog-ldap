@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * date : 2023-06-26
  */
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
-  Optional<RefreshToken> findByUserId(Long userId);
+  Optional<RefreshToken> findById(String id);
   Optional<RefreshToken> findByRefreshToken(String refreshToken);
 }

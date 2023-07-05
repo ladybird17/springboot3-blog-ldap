@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -59,6 +61,23 @@ public class WebSecurityConfig {
         .passwordCompare()
         .passwordEncoder(new BCryptPasswordEncoder())
         .passwordAttribute("userPassword");
+  }
+
+  @Bean
+  public LdapTemplate ldapTemplate() {
+    return new LdapTemplate(contextSource());
+  }
+
+  @Bean
+  public LdapContextSource contextSource() {
+    LdapContextSource contextSource = new LdapContextSource();
+
+    contextSource.setUrl("ldap://localhost:8389");
+    contextSource.setBase("dc=springframework,dc=org");
+    contextSource.setUserDn("uid=krishna,ou=people,dc=springframework,dc=org");
+    contextSource.setPassword("$2a$10$nnu2.EBSnJUQZmOv5hbD8.3C8dlifeLi26AWpoKN31FqjNXrijQMq");
+
+    return contextSource;
   }
 
 }
