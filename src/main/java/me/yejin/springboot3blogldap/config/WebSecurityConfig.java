@@ -40,7 +40,7 @@ public class WebSecurityConfig {
     //특정 HTTP 요청에 대한 웹 기반 보안 구성
     return http.authorizeHttpRequests(authorize -> authorize
           .requestMatchers("/login").permitAll()
-          .requestMatchers(HttpMethod.DELETE, "/api/articles/*").hasRole("MANAGERS")
+          .requestMatchers(HttpMethod.DELETE, "/api/articles/*").hasRole("ADMIN")
           .anyRequest().authenticated()
         )//인증, 인가 설정
         .formLogin(login -> login.loginPage("/login").permitAll().defaultSuccessUrl("/articles")
