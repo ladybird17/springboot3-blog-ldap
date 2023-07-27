@@ -11,9 +11,10 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -21,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * <p>
  * date : 2023-06-20
  */
+@EnableWebSecurity
 @RequiredArgsConstructor
 @Configuration
 public class WebSecurityConfig {
@@ -51,15 +53,18 @@ public class WebSecurityConfig {
 
   @Autowired
   public void configure(AuthenticationManagerBuilder auth) throws Exception {
+
     auth
         .ldapAuthentication()
-        .userDnPatterns("uid={0},ou=people")
+        .userDnPatterns("uid={0},ou=users")
         .groupSearchBase("ou=groups")
         .contextSource()
-        .url("ldap://localhost:8389/dc=springframework,dc=org")
+        .url("ldap://localhost:389/dc=ldap,dc=yejin,dc=co,dc=kr")
+        .managerDn("cn=admin,dc=ldap,dc=yejin,dc=co,dc=kr")
+        .managerPassword("admin")
         .and()
         .passwordCompare()
-        .passwordEncoder(new BCryptPasswordEncoder())
+        .passwordEncoder(new LdapShaPasswordEncoder())
         .passwordAttribute("userPassword");
   }
 
@@ -72,10 +77,10 @@ public class WebSecurityConfig {
   public LdapContextSource contextSource() {
     LdapContextSource contextSource = new LdapContextSource();
 
-    contextSource.setUrl("ldap://localhost:8389");
-    contextSource.setBase("dc=springframework,dc=org");
-    contextSource.setUserDn("uid=krishna,ou=people,dc=springframework,dc=org");
-    contextSource.setPassword("$2a$10$nnu2.EBSnJUQZmOv5hbD8.3C8dlifeLi26AWpoKN31FqjNXrijQMq");
+    contextSource.setUrl("ldap://localhost:389");
+    contextSource.setBase("dc=ldap,dc=yejin,dc=co,dc=kr");
+    contextSource.setUserDn("cn=admin,dc=ldap,dc=yejin,dc=co,dc=kr");
+    contextSource.setPassword("admin");
 
     return contextSource;
   }
