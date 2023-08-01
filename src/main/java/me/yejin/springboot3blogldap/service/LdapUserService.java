@@ -8,6 +8,7 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class LdapUserService {
     Object createUser = LdapUser.builder()
         .dn(dn)
         .uid(uid)
-        .userPassword(new BCryptPasswordEncoder().encode(password))
+        .userPassword(new LdapShaPasswordEncoder().encode(password))
         .cn(cn)
         .sn(sn)
         .build();

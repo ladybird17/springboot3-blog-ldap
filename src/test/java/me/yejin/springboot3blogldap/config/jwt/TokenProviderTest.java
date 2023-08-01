@@ -40,7 +40,7 @@ public class TokenProviderTest {
   @Test
   void generateToken() throws InvalidNameException {
     //given
-    String dn = "uid=angel,ou=people";
+    String dn = "uid=angel,ou=users";
     userService.createLdapUser(dn, "angel", "a123", "Angel Heart", "Heart");
     LdapUser createdUser = userService.findLdapUser("angel");
 
@@ -89,7 +89,7 @@ public class TokenProviderTest {
   @Test
   void getAuthentication() {
     //given
-    String username = "krishna";
+    String username = "yejin";
     String token = JwtFactory.builder()
         .subject(username)
         .build()
