@@ -43,11 +43,12 @@ public class WebSecurityConfig {
           .requestMatchers(HttpMethod.DELETE, "/api/articles/*").hasRole("ADMIN")
           .anyRequest().authenticated()
         )//인증, 인가 설정
-        .formLogin(login -> login.loginPage("/login").permitAll().defaultSuccessUrl("/articles")
+        .formLogin(login -> login.permitAll().defaultSuccessUrl("/articles")
         )//폼 기반 로그인 설정
         .logout(logout -> logout.logoutSuccessUrl("/login").invalidateHttpSession(true)
         )//로그아웃 설정
         .csrf(AbstractHttpConfigurer::disable)//csrf 비활성화
+        .oauth2Login(oauth2 -> oauth2.permitAll().defaultSuccessUrl("/articles"))
         .build();
   }
 
