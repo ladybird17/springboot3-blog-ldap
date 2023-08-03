@@ -27,4 +27,12 @@ public class TokenApiController {
 
     return ResponseEntity.status(HttpStatus.CREATED).body(new CreateAccessTokenResponse(newAccessToken));
   }
+
+  @PostMapping("/api/token/ldap")
+  public ResponseEntity<CreateAccessTokenResponse> createNewLdapAccessToken(
+      @RequestBody CreateAccessTokenRequest request){
+    String newAccessToken = tokenService.createNewLdapAccessToken(request.getRefreshToken());
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(new CreateAccessTokenResponse(newAccessToken));
+  }
 }

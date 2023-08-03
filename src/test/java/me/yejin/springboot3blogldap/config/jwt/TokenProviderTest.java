@@ -38,14 +38,14 @@ public class TokenProviderTest {
 
   @DisplayName("generateToken(): 유저 정보와 만료 기간을 전달해 토큰을 만드는 것에 성공한다.")
   @Test
-  void generateToken() throws InvalidNameException {
+  void generateLdapToken() throws InvalidNameException {
     //given
     String dn = "uid=angel,ou=users";
     userService.createLdapUser(dn, "angel", "a123", "Angel Heart", "Heart");
     LdapUser createdUser = userService.findLdapUser("angel");
 
     //when
-    String token = tokenProvider.generateToken(createdUser, Duration.ofDays(14));
+    String token = tokenProvider.generateLdapToken(createdUser, Duration.ofDays(14));
     //then
     String resultDn = Jwts.parser()
         .setSigningKey(jwtProperties.getSecretKey())

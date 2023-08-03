@@ -4,6 +4,7 @@ import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import me.yejin.springboot3blogldap.config.jwt.TokenProvider;
 import me.yejin.springboot3blogldap.domain.LdapUser;
+import me.yejin.springboot3blogldap.domain.User;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,15 +18,28 @@ public class TokenService {
   private final TokenProvider tokenProvider;
   private final RefreshTokenService refreshTokenService;
 
-  private final LdapUserService userService;
+  private final UserService userService;
+  private final LdapUserService ldapUserService;
 
-  public String createNewAccessToken(String refreshToken){
+  public String createNewAccessToken(String refreshToken) {
+    // 토큰 유효성 검사에 실패하면 예외 발생
+    if(!tokenProvider.validToken(refreshToken)) {
+      throw new IllegalArgumentException("Unexpected token");
+    }
+
+    Long userId = Long.getLong(refreshTokenService.findByRefreshToken(refreshToken).getUsername());
+    User user = userService.findById(userId);
+
+    return tokenProvider.generateToken(user, Duration.ofHours(2));
+  }
+
+  public String createNewLdapAccessToken(String refreshToken){
     if(!tokenProvider.validToken(refreshToken)){
       throw new IllegalArgumentException("Unexpected token");
     }
 
     String username = refreshTokenService.findByRefreshToken(refreshToken).getUsername();
-    LdapUser user = userService.findLdapUser(username);
-    return tokenProvider.generateToken(user, Duration.ofHours(2));
+    LdapUser user = ldapUserService.findLdapUser(username);
+    return tokenProvider.generateLdapToken(user, Duration.ofHours(2));
   }
 }
