@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.yejin.springboot3blogldap.config.jwt.TokenProvider;
 import me.yejin.springboot3blogldap.domain.LdapUser;
 import me.yejin.springboot3blogldap.domain.User;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,7 +28,7 @@ public class TokenService {
       throw new IllegalArgumentException("Unexpected token");
     }
 
-    Long userId = Long.getLong(refreshTokenService.findByRefreshToken(refreshToken).getUsername());
+    Long userId = NumberUtils.toLong(refreshTokenService.findByRefreshToken(refreshToken).getUsername());
     User user = userService.findById(userId);
 
     return tokenProvider.generateToken(user, Duration.ofHours(2));
