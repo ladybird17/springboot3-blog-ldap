@@ -58,7 +58,7 @@ public class TokenProvider {
         .setIssuer(jwtProperties.getIssuer())
         .setIssuedAt(now)
         .setExpiration(expiry)
-        .setSubject(user.getUid())
+        .setSubject(user.getEmail())
         .claim("dn", user.getDn().toString())
         .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
         .compact();

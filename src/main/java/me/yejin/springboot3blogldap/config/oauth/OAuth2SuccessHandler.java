@@ -1,18 +1,20 @@
 package me.yejin.springboot3blogldap.config.oauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import me.yejin.springboot3blogldap.config.jwt.TokenProvider;
 import me.yejin.springboot3blogldap.domain.RefreshToken;
 import me.yejin.springboot3blogldap.domain.User;
+import me.yejin.springboot3blogldap.dto.SessionUser;
 import me.yejin.springboot3blogldap.repository.RefreshTokenRepository;
 import me.yejin.springboot3blogldap.service.UserService;
 import me.yejin.springboot3blogldap.util.CookieUtil;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,11 +37,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private final RefreshTokenRepository refreshTokenRepository;
   private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
   private final UserService userService;
-
+  private final HttpSession httpSession;
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-    User user = userService.findByEmail((String) oAuth2User.getAttributes().get("email"));
+    SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+    User user = userService.findByEmail(sessionUser.getEmail());
 
     String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
     saveRefreshToken(user.getId(), refreshToken);

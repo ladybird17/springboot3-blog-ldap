@@ -38,13 +38,17 @@ public final class LdapUser {
   @Attribute(name="sn")
   private String sn;
 
+  @Attribute(name="Email")
+  private String email;
+
   @Builder
-  public LdapUser(String dn, String uid, String userPassword, String cn, String sn) throws InvalidNameException {
+  public LdapUser(String dn, String uid, String userPassword, String cn, String sn, String email) throws InvalidNameException {
     this.dn = new LdapName(dn);
     this.uid = uid;
     this.userPassword = userPassword;
     this.cn = cn;
     this.sn = sn;
+    this.email = email;
   }
 
 }

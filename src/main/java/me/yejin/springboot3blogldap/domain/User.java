@@ -35,6 +35,9 @@ public class User implements UserDetails {
   @Column(name = "email", nullable = false, unique = true)
   private String email;
 
+  @Column(name = "picture")
+  private String picture;
+
   @Column(name = "password")
   private String password;
 
@@ -48,8 +51,9 @@ public class User implements UserDetails {
     this.nickname = nickname;
   }
 
-  public User update(String nickname) {
+  public User update(String nickname, String picture) {
     this.nickname = nickname;
+    this.picture = picture;
 
     return this;
   }
