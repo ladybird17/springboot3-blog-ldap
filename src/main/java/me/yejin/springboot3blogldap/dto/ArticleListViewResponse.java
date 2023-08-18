@@ -1,6 +1,5 @@
 package me.yejin.springboot3blogldap.dto;
 
-import java.time.LocalDateTime;
 import lombok.Getter;
 import me.yejin.springboot3blogldap.domain.Article;
 
