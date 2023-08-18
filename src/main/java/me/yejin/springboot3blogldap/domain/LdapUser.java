@@ -1,32 +1,38 @@
 package me.yejin.springboot3blogldap.domain;
 
+import java.util.Collection;
+import java.util.List;
 import javax.naming.InvalidNameException;
 import javax.naming.Name;
 import javax.naming.ldap.LdapName;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.DnAttribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.ldap.userdetails.LdapUserDetails;
+
 /**
  * author : yjseo
  * <p>
  * date : 2023-07-03
  */
 @NoArgsConstructor
-@Data
+@Getter
 @Entry(
     base = "ou=users",
     objectClasses = { "top","inetOrgPerson" })
-public final class LdapUser {
+public final class LdapUser implements LdapUserDetails {
 
   @Id
   private Name dn;
 
   @Attribute(name="uid")
-  @DnAttribute(value="uid", index=0)
+  @DnAttribute(value="uid", index=1)
   private String uid;
 
   @Attribute(name="userPassword")
@@ -38,7 +44,7 @@ public final class LdapUser {
   @Attribute(name="sn")
   private String sn;
 
-  @Attribute(name="Email")
+  @Attribute(name="mail")
   private String email;
 
   @Builder
@@ -51,4 +57,48 @@ public final class LdapUser {
     this.email = email;
   }
 
+  @Override
+  public void eraseCredentials() {
+    this.userPassword = null;
+  }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority("user"));
+  }
+
+  @Override
+  public String getDn() {
+    return this.dn.toString();
+  }
+
+  @Override
+  public String getPassword() {
+    return this.userPassword;
+  }
+
+  @Override
+  public String getUsername() {
+    return this.email;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
 }

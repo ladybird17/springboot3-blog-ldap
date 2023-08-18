@@ -65,6 +65,11 @@ public class WebSecurityConfig {
     .formLogin(login -> login
         .permitAll()
         .defaultSuccessUrl("/articles")
+        .successHandler(new LdapSuccessHandler(tokenProvider,
+        refreshTokenRepository,
+        oAuth2AuthorizationRequestBasedOnCookieRepository(),
+        ldapUserService,
+        httpSession))
     )
     .logout(logout -> logout.logoutSuccessUrl("/login").invalidateHttpSession(true)
     )

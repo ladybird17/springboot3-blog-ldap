@@ -1,5 +1,6 @@
 package me.yejin.springboot3blogldap.service;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.List;
 import javax.naming.InvalidNameException;
@@ -8,6 +9,7 @@ import javax.naming.directory.Attributes;
 import lombok.extern.slf4j.Slf4j;
 import me.yejin.springboot3blogldap.domain.LdapUser;
 import me.yejin.springboot3blogldap.domain.User;
+import me.yejin.springboot3blogldap.dto.SessionUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
@@ -33,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LdapUserService implements UserDetailsService {
   @Autowired
+  private HttpSession httpSession;
+  @Autowired
   private LdapTemplate ldapTemplate;
 
   private LdapContextSource contextSource;
@@ -44,10 +48,10 @@ public class LdapUserService implements UserDetailsService {
   private String userPassword;
 
   public LdapUserService(LdapTemplate ldapTemplate) {
+    this.userId = "uid";
     this.contextSource = (LdapContextSource) ldapTemplate.getContextSource();
     this.searchBase = contextSource.getBaseLdapPathAsString();
-    this.dnPattern = contextSource.getUserDn();
-    this.userId = "uid";
+    this.dnPattern =userId+"={0},ou=users";
     this.userCommanName = "cn";
     this.userPassword = this.contextSource.getPassword();
   }
@@ -58,7 +62,7 @@ public class LdapUserService implements UserDetailsService {
   }
 
   public LdapUser findByEmail(String email) {
-    LdapQuery qry = LdapQueryBuilder.query().where("email").is(email);
+    LdapQuery qry = LdapQueryBuilder.query().where("mail").is(email);
     return ldapTemplate.findOne(qry, LdapUser.class);
   }
 
@@ -78,18 +82,19 @@ public class LdapUserService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     LdapQuery qry = LdapQueryBuilder.query().where(userId).is(username);
-    List<LdapUserDetails> users = ldapTemplate.search(qry, new LdapUserDetailsMapper());
+    List<LdapUser> users = ldapTemplate.search(qry, new LdapUserMapper());
     if (users.isEmpty()) {
       throw new UsernameNotFoundException("User not found with username: " + username);
     }
-    UserDetails user = (UserDetails)users.get(0);
-    return new User(null, user.getPassword(), username);
+    LdapUser user = users.get(0);
+    httpSession.setAttribute("user", new SessionUser(user));
+    return new User(user.getEmail(), user.getPassword(), username);
   }
 
   //Mapping the LDAP attributes.
-  private class LdapUserDetailsMapper implements AttributesMapper<LdapUserDetails> {
+  private class LdapUserMapper implements AttributesMapper<LdapUser> {
     @Override
-    public LdapUserDetails mapFromAttributes(Attributes attributes) throws NamingException {
+    public LdapUser mapFromAttributes(Attributes attributes) throws NamingException {
       LdapUserDetailsImpl.Essence essence = new LdapUserDetailsImpl.Essence();
       try {
         essence.setUsername(attributes.get(userCommanName).get().toString());
@@ -100,7 +105,16 @@ public class LdapUserService implements UserDetailsService {
         e.printStackTrace();
       }
       essence.setAuthorities(Collections.emptyList());
-      return essence.createUserDetails();
+      LdapUserDetails ldapUserDetails = essence.createUserDetails();
+      LdapUser ldapUser = LdapUser.builder()
+          .dn(ldapUserDetails.getDn())
+          .uid(attributes.get(userId).get().toString())
+          .userPassword(ldapUserDetails.getPassword())
+          .cn(ldapUserDetails.getUsername())
+          .sn(attributes.get("sn").get().toString())
+          .email(attributes.get("mail").get().toString())
+          .build();
+      return ldapUser;
     }
 
   }
