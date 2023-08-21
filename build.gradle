@@ -24,6 +24,7 @@ dependencies {
 
     //OAUTH2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.11'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     //LDAP
     implementation 'org.springframework.ldap:spring-ldap-core'

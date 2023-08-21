@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -24,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * author : yjseo
@@ -70,7 +72,10 @@ public class WebSecurityConfig {
         ldapUserService,
         httpSession))
     )
-    .logout(logout -> logout.logoutSuccessUrl("/login").invalidateHttpSession(true)
+    .logout(logout -> logout
+        .logoutSuccessUrl("/login")
+        .invalidateHttpSession(true)
+        .addLogoutHandler(new KeycloakLogoutHandler(restTemplate()))
     )
     .userDetailsService(ldapUserService)
     .csrf(AbstractHttpConfigurer::disable)//csrf 비활성화
@@ -83,13 +88,20 @@ public class WebSecurityConfig {
         .userInfoEndpoint(userInfo -> userInfo
             .userService(oAuth2UserCustomService)
         )
+        .defaultSuccessUrl("/articles")
     );
 
     http.exceptionHandling(config -> config
     .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
     new AntPathRequestMatcher("/api/**")));
 
+    http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
     return http.build();
+  }
+
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
   }
 
   @Bean
