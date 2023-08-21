@@ -5,15 +5,15 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.time.Duration;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import me.yejin.springboot3blogldap.domain.LdapUser;
 import me.yejin.springboot3blogldap.domain.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -79,7 +79,7 @@ public class TokenProvider {
 
   public Authentication getAuthentication(String token) {
     Claims claims = getClaims(token);
-    Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+    Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
     return new UsernamePasswordAuthenticationToken(new org.springframework.
         security.core.userdetails.User(claims.getSubject(), "", authorities)

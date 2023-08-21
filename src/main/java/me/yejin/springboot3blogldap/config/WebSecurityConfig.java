@@ -58,7 +58,6 @@ public class WebSecurityConfig {
     http.authorizeHttpRequests(authorize -> authorize
       .requestMatchers("/login").permitAll()
       .requestMatchers("/api/token").permitAll()
-      .requestMatchers("/api/**").authenticated()
       .requestMatchers(HttpMethod.DELETE, "/api/articles/*").hasRole("ADMIN")
       .anyRequest().authenticated()
     )
