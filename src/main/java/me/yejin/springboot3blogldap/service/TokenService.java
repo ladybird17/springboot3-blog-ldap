@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import me.yejin.springboot3blogldap.config.jwt.TokenProvider;
 import me.yejin.springboot3blogldap.domain.LdapUser;
 import me.yejin.springboot3blogldap.domain.User;
-import me.yejin.springboot3blogldap.dto.SessionUser;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +43,6 @@ public class TokenService {
 
     String username = refreshTokenService.findByRefreshToken(refreshToken).getUsername();
     LdapUser user = ldapUserService.findLdapUser(username);
-    httpSession.setAttribute("user", new SessionUser(user));
     return tokenProvider.generateLdapToken(user, Duration.ofHours(2));
   }
 }
