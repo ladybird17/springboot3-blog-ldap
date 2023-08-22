@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.yejin.springboot3blogldap.domain.LdapUser;
 import me.yejin.springboot3blogldap.domain.User;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /**
  * author : yejin
@@ -28,6 +29,12 @@ public class SessionUser implements Serializable {
     this.name = user.getCn();
     this.email = user.getEmail();
     this.picture = null;
+  }
+
+  public SessionUser(OidcUser oidcUser){
+    this.name = oidcUser.getName();
+    this.email = oidcUser.getEmail();
+    this.picture = oidcUser.getPicture();
   }
 
 }

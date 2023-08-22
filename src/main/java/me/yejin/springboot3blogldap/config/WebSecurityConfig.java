@@ -9,6 +9,7 @@ import me.yejin.springboot3blogldap.config.oauth.OAuth2AuthorizationRequestBased
 import me.yejin.springboot3blogldap.config.oauth.OAuth2SuccessHandler;
 import me.yejin.springboot3blogldap.config.oauth.OAuth2UserCustomService;
 import me.yejin.springboot3blogldap.repository.RefreshTokenRepository;
+import me.yejin.springboot3blogldap.service.KeycloakOAuth2CustomService;
 import me.yejin.springboot3blogldap.service.LdapUserService;
 import me.yejin.springboot3blogldap.service.UserService;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,7 @@ public class WebSecurityConfig {
 
   private final LdapUserService ldapUserService;
   private final OAuth2UserCustomService oAuth2UserCustomService;
+  private final KeycloakOAuth2CustomService keycloakOAuth2CustomService;
   private final TokenProvider tokenProvider;
   private final RefreshTokenRepository refreshTokenRepository;
   private final UserService userService;
@@ -86,7 +88,7 @@ public class WebSecurityConfig {
         )
         .successHandler(oAuth2SuccessHandler())
         .userInfoEndpoint(userInfo -> userInfo
-            .userService(oAuth2UserCustomService)
+            .userService(oAuth2UserCustomService).oidcUserService(keycloakOAuth2CustomService)
         )
     );
 
