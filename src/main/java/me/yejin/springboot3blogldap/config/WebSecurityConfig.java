@@ -88,7 +88,6 @@ public class WebSecurityConfig {
         .userInfoEndpoint(userInfo -> userInfo
             .userService(oAuth2UserCustomService)
         )
-        .defaultSuccessUrl("/articles")
     );
 
     http.exceptionHandling(config -> config
